@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import argparse
 import csv
 import sys
@@ -19,9 +21,10 @@ ATRIBUTOS:
     -state:    ready_to_launch -> está subido pero todavía no se está procesando.
                launched -> se está procesando
                ready -> ya se ha procesado. Los ficheros ya se podrán descargar.
+    -links:		 array con los enlaces de descarga (tres elementos).
                
 '''
-Job = namedtuple("MyStruct", "job_id filename date state links")
+Job = namedtuple("Job", "job_id filename date state links")
 
 
 
@@ -68,13 +71,14 @@ def login(base_url, email, password):
 
 
 '''
-Obtiene el listado de ficheros.
+Obtiene el listado de ficheros. 
+IMPORTANTE: Por ahora no soporta la navegación entre páginas.
 
 @param base_url Url de volBrain
 @param session Objeto Session devuelto por login()
 @param return Array de instancias de Job.
 '''
-def get_job_list(base_url, session):
+def get_jobs_list(base_url, session):
     jobs = []
     
     # Aunque la tabla con la lista de ficheros aparece en 
@@ -144,7 +148,7 @@ Dado un trabajo, descarga sus ficheros si es posible.
 def download_job_files(job, folder = None, create_subfolder = True):
     
     # Se comprueba si la descarga está lista.
-    if job.state is not 'ready' return
+    if job.state is not 'ready': return
     
     # La carpeta de destino, por defecto, es la carpeta
     # donde se ejecuta el script.
@@ -179,7 +183,7 @@ def main():
         #session = login(base_url, 'vicrivaz@inf.upv.es', '09081996')
         session = login(base_url, 'rafaelspam1234@gmail.com', 'rafaelspam')
         
-        jobs = get_job_list(base_url, session)
+        jobs = get_jobs_list(base_url, session)
         
         print('Jobs: ', len(jobs))
         for job in jobs:
@@ -187,7 +191,9 @@ def main():
             for link in job.links:
                 print('\t', link)
         
-        download_job_files(jobs[0], create_subfolder = False)      
+        if (len(jobs) > 0) :
+        	   download_job_files(jobs[0], create_subfolder = False)      
+        
     except LoginException:
         print("Login error.")
         exit()
