@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 
-from gui import Ui_MainWindow
+from Ui_MainWindow import Ui_MainWindow
 
 ### VENTANA PRINCIPAL ###
 class volBrainClient(QtWidgets.QMainWindow):
