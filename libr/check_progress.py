@@ -87,15 +87,10 @@ def get_jobs_list(base_url, session):
     # de hacer la petición a members.php esa tabla todavía no
     # está cargada y no se encontrará en el DOM.
     # Por tanto, la petición se hará a ajax_jobs_list.php
-    # que es la tabla que contiene verdaderamente la tabla.
+    # que es la página que contiene verdaderamente la tabla.
     
     r = session.get(base_url + 'ajax_jobs_list.php')
     
-    # La página members.php tiene un div con id =  job_list.
-    # Ese div contiene una tabla. Algunas de las filas de esa
-    # tabla representan los trabajos. Algunos de ellos estarán
-    # procesados y otros no.
-    #print(r.content)
     soup = BeautifulSoup(r.content, "lxml")
 
     # Algunos de los tr representan archivos subidos, otros
