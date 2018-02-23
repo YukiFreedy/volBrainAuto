@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import argparse
-import csv
 import sys
-import time
 import os
+import re
 
 import requests
 from bs4 import BeautifulSoup
@@ -63,7 +61,7 @@ def login(base_url, email, password):
     
     # Si en la página no hay un formulario significa que
     # el login no ha ido bien.    
-    if form is None: raise exception('Login not correct.')
+    if form is None: raise LoginException()
     
     # Se devuelve el objeto session para poder lanzar nuevas
     # peticiones desde fuera de la función.
@@ -71,14 +69,16 @@ def login(base_url, email, password):
 
 
 '''
-Obtiene el listado de ficheros. 
-IMPORTANTE: Por ahora no soporta la navegación entre páginas.
+Obtiene el listado de ficheros en una página.
 
 @param base_url Url de volBrain
 @param session Objeto Session devuelto por login()
-@param return Array de instancias de Job.
+@param return Devuelve una tupla en la que el primer elemento
+                es un array de instancias de Job y el segundo
+                es un boolean que valdrá True si hay otra página
+                de resultados.
 '''
-def get_jobs_list(base_url, session):
+def get_jobs_in_page(base_url, session, page = 1):
     jobs = []
     
     # Aunque la tabla con la lista de ficheros aparece en 
@@ -89,7 +89,7 @@ def get_jobs_list(base_url, session):
     # Por tanto, la petición se hará a ajax_jobs_list.php
     # que es la página que contiene verdaderamente la tabla.
     
-    r = session.get(base_url + 'ajax_jobs_list.php')
+    r = session.get(base_url + 'ajax_jobs_list.php?p=' + str(page))
     
     soup = BeautifulSoup(r.content, "lxml")
 
@@ -132,7 +132,47 @@ def get_jobs_list(base_url, session):
         
         jobs += [Job(job_id, filename, date, state, links)]
     
+    # Se averigua si hay una siguiente página.
+    hasNext = soup.find('span', {'onclick': 'javascript:loadJobList(' + str(page + 1) +');'}) is not None
+    
+    return (jobs, hasNext)
+
+'''
+Devuelve todos los trabajos. Para ello recorre todas las páginas
+de resultados.
+'''
+def get_all_jobs(base_url, session):
+    current_page = 1
+    (jobs, hasNext) = get_jobs_in_page(base_url, session, current_page)
+    
+    while hasNext == True:
+        current_page += 1
+        (j, hasNext) = get_jobs_in_page(base_url, session, current_page)
+        jobs += j
+        
     return jobs
+
+'''
+Devuelve el número de páginas.
+'''
+def count_pages(base_url, session):
+    r = session.get(base_url + 'ajax_jobs_list.php')
+    
+    soup = BeautifulSoup(r.content, "lxml")
+
+    spans = soup.find_all('span', {'style' : 'color:blue;cursor:pointer;cursor:hand;'})
+    
+    if len(spans) == 0: return 1
+    
+    # Se busca en el último span, que se corresponde con el
+    # enlace a la última página, y se busca en el atributo
+    # onclick el número de la página.
+    onclick = spans[len(spans) - 1]['onclick']
+    
+    p = re.compile('javascript:loadJobList\((.+)\).*')
+    
+    return p.search(onclick).group(1)
+     
 
 '''
 Dado un trabajo, descarga sus ficheros si es posible.
@@ -169,25 +209,27 @@ def download_job_files(job, folder = None, create_subfolder = True):
 #############################
 ###  PROGRAMA DE PRUEBA  ####
 #############################
+'''
 def main():
     print("volBrain")
     session = None
     base_url = 'http://volbrain.upv.es/'
     
     try:
-        #session = login(base_url, 'vicrivaz@inf.upv.es', '09081996')
-        session = login(base_url, 'rafaelspam1234@gmail.com', 'rafaelspam')
+        session = login(base_url, 'vicrivaz@inf.upv.es', '09081996')
+        #session = login(base_url, 'rafaelspam1234@gmail.com', 'rafaelspam')
         
-        jobs = get_jobs_list(base_url, session)
+        jobs = get_all_jobs(base_url, session)
+        pages = count_pages(base_url, session)
         
-        print('Jobs: ', len(jobs))
+        print('Jobs: ', len(jobs), pages, 'pages')
         for job in jobs:
             print("'", "'", job.job_id, "'", job.filename, " ", job.date, " ", job.state)
             for link in job.links:
                 print('\t', link)
         
-        if (len(jobs) > 0) :
-        	   download_job_files(jobs[0], create_subfolder = False)      
+        #if (len(jobs) > 0) :
+        #	   download_job_files(jobs[0], create_subfolder = False)      
         
     except LoginException:
         print("Login error.")
@@ -198,5 +240,5 @@ def main():
 
 if __name__ == '__main__':
     main()
-
+'''
     
