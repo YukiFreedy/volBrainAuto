@@ -4,6 +4,7 @@ import sys
 
 from Ui_MainWindow import Ui_MainWindow
 from Ui_Login import Ui_Login
+from Ui_ProcessWindow import Ui_ProcessWindow
 
 import check_progress as check
 
@@ -34,9 +35,27 @@ class volBrainClient(QtWidgets.QMainWindow):
             currentFiles = []
             self.ui.listWidget.clear()
 
+        def openProcessWindow():
+            win = ProcessWindow()
+            win.show()
+
         self.ui.selectFilesButton.clicked.connect(chooseFile)
         self.ui.cleanButton.clicked.connect(cleanList)
+        self.ui.showJobsButton.clicked.connect(openProcessWindow)
 
+## VENTANA DE FILE PROGRESS ##
+class ProcessWindow(QtWidgets.QMainWindow):
+
+    def __init__(self, parent=None):
+        super(ProcessWindow, self).__init__(parent)
+
+        self.ui = Ui_ProcessWindow()
+        self.ui.setupUi(self)
+
+        def close():
+            self.close()
+
+        self.ui.pushButton.clicked.connect(close)
 
 ## VENTANA DE LOGIN ##
 class LoginDialog(QtWidgets.QDialog):
