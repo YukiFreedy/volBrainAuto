@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Task</class>
+ <widget class="QWidget" name="Task">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>681</width>
+    <height>56</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>56</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0,0">
+   <item>
+    <widget class="QLabel" name="filename">
+     <property name="text">
+      <string>filename</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="date">
+     <property name="text">
+      <string>00/00/0000</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="leftMargin">
+      <number>15</number>
+     </property>
+     <property name="rightMargin">
+      <number>15</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="processingLabel">
+       <property name="text">
+        <string>Procesando...</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="readyLabel">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string>Procesado</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="readyToLaunchLabel">
+       <property name="text">
+        <string>En la cola</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="viewButton">
+     <property name="text">
+      <string>Ver</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="downloadButton">
+     <property name="text">
+      <string>Descargar</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

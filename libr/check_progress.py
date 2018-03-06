@@ -193,7 +193,7 @@ def download_job_files(job, folder = None, create_subfolder = True):
     # cada trabajo o si prefiere meter todos los ficheros en
     # la misma carpeta.
     if create_subfolder:
-        folder += 'job_' + job.job_id
+        folder += 'job_' + job.job_id + '/'
 
     if not os.path.exists(folder):
         os.makedirs(folder)
