@@ -1,11 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QFileDialog
 import sys
 
 from Ui_MainWindow import Ui_MainWindow
 from Ui_Login import Ui_Login
-from Ui_ProcessWindow import Ui_ProcessWindow
-from TaskWidget import TaskWidget
 
+import ProcessWindow
 import check_progress as check
 
 
@@ -43,33 +43,9 @@ class volBrainClient(QtWidgets.QMainWindow):
         self.ui.listWidget.clear()
 
     def openProcessWindow(self):
-        self.win = ProcessWindow(self.base_url, self.session)
+        self.win = ProcessWindow.ProcessWindow(self.base_url, self.session)
         self.win.show()
 
-## VENTANA DE FILE PROGRESS ##
-class ProcessWindow(QtWidgets.QMainWindow):
-
-    def __init__(self, base_url, session, parent=None):
-        super(ProcessWindow, self).__init__(parent)
-        
-        self.ui = Ui_ProcessWindow()
-        self.ui.setupUi(self)
-
-        self.ui.backButton.clicked.connect(self.close)
-        
-        (jobs, hasNext) = check.get_jobs_in_page(base_url, session)
-        
-        for job in jobs:      
-            taskWidget = TaskWidget(job)
-            taskWidget.download.connect(self.downloadJob)
-            self.ui.jobListLayout.addWidget(taskWidget)
-        
-        self.ui.jobListLayout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-    
-    #SLOT. El usuario ha solicitado la descarga de un fichero.
-    def downloadJob(self, job):
-        print(job.filename)
-        check.download_job_files(job, None, True)
 
 ## VENTANA DE LOGIN ##
 class LoginDialog(QtWidgets.QDialog):

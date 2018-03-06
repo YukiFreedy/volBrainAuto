@@ -31,7 +31,15 @@ class TaskWidget(QtWidgets.QWidget):
             self.ui.readyLabel.hide()
             
         self.ui.downloadButton.clicked.connect(self.requestDownload)
-        
+    
+    # Envía una señal para notificar que se ha hecho clic
+    # en el botón de descargar.
     def requestDownload(self):
         self.download.emit(self.job)
         pass
+    
+    # Sirve para notificar al TaskWidget que el trabajo que representa
+    # está siendo descargado.
+    def downloading(self):
+        self.ui.downloadButton.setText("Descargando...")
+        self.ui.downloadButton.setEnabled(False)

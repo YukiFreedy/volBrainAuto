@@ -22,9 +22,16 @@ ATRIBUTOS:
     -links:		 array con los enlaces de descarga (tres elementos).
                
 '''
-Job = namedtuple("Job", "job_id filename date state links")
-
-
+#Job = namedtuple("Job", "job_id filename date state links")
+class Job:
+    def __init__(self, job_id, filename, date, state, links):
+        self.job_id = job_id
+        self.filename = filename
+        self.date = date
+        self.state = state
+        self.links = links
+    def __eq__(self, other_job):
+        return other_job.job_id == self.job_id
 
 
 '''
