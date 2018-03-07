@@ -22,7 +22,6 @@ ATRIBUTOS:
     -links:		 array con los enlaces de descarga (tres elementos).
                
 '''
-#Job = namedtuple("Job", "job_id filename date state links")
 class Job:
     def __init__(self, job_id, filename, date, state, links):
         self.job_id = job_id
@@ -204,7 +203,8 @@ def download_job_files(job, folder = None, create_subfolder = True):
 
     if not os.path.exists(folder):
         os.makedirs(folder)
-      
+    
+    print(folder + 'mni' + job.job_id +'.zip')
     urllib.request.urlretrieve(job.links[0], folder + 'mni' + job.job_id +'.zip')
     urllib.request.urlretrieve(job.links[1], folder + 'nat' + job.job_id +'.zip')
     urllib.request.urlretrieve(job.links[2], folder + 'pdf' + job.job_id +'.pdf')
