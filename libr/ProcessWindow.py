@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import pyqtSignal
 from Ui_ProcessWindow import Ui_ProcessWindow
 import threading
 
@@ -7,8 +8,13 @@ import check_progress as check
 
 # Esta clase auxiliar sirve para gestionar la descarga de archivos
 # en un hilo a parte para evitar que se congele la interfaz.
-class JobDownloadManager:
+class JobDownloadManager(QtCore.QObject):
+    # El manager enviará una señal cuando la descarga de un trabajo
+    # haya terminado. Mandará como parámetro el trabajo.
+    downloaded = pyqtSignal(check.Job)
+    
     def __init__(self):
+        super(JobDownloadManager, self).__init__()
         self.pendant = []
         self.running = False
     
@@ -26,6 +32,7 @@ class JobDownloadManager:
             print('Downloading: ' + job.filename)
             check.download_job_files(job)
             print('Downloaded: ' + job.filename)
+            self.downloaded.emit(job)
         self.running = False
         print('Thread finished')
         
@@ -47,6 +54,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         super(ProcessWindow, self).__init__(parent)
         
         self.jobDownloadManager = JobDownloadManager()
+        self.jobDownloadManager.downloaded.connect(self.jobDownloaded)
         
         self.ui = Ui_ProcessWindow()
         self.ui.setupUi(self)
@@ -55,15 +63,30 @@ class ProcessWindow(QtWidgets.QMainWindow):
         
         (jobs, hasNext) = check.get_jobs_in_page(base_url, session)
         
-        for job in jobs:      
+        self.taskWidgets = []
+        
+        for job in jobs: 
             taskWidget = TaskWidget(job)
             taskWidget.download.connect(self.downloadJob)
             self.ui.jobListLayout.addWidget(taskWidget)
+            
+            self.taskWidgets += [taskWidget]
         
         self.ui.jobListLayout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
     
-    #SLOT. El usuario ha solicitado la descarga de un fichero.
+    #SLOT. Este slot se ejecuta cuando el usuario solicita la descarga
+    # de algún trabajo.
     def downloadJob(self, job):
+        # El JobDownloadManager se encarga de gestionar la descarga
+        # en un hilo a parte.
         self.jobDownloadManager.addJob(job)
+        
+        # Notificamos al widget que la descarga ha comenzado.
         self.sender().downloading()
+    
+    def jobDownloaded(self, job):
+        for taskWidget in self.taskWidgets:
+            if (taskWidget.getJob() == job):
+                taskWidget.downloaded()
+                break
         
