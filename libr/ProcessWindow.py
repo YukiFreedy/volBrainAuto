@@ -83,6 +83,7 @@ class ConfigDownloadDialog(QtWidgets.QDialog):
         self.ui.buttonBox.accepted.connect(self.save)
     
     def save(self):
+        self.config['download'] = {}
         self.config['download']['folder'] = self.ui.targetFolderLabel.text()
         self.config['download']['create_subfolder'] = str(self.ui.createSubfolderCheckbox.isChecked())
         
@@ -160,7 +161,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         # Cargar la configuración para saber dónde descargar los archivos #
         config = configparser.ConfigParser()
         config.read('config.ini')
-        folder = config.get('download', 'folder', fallback = '.')
+        folder = config.get('download', 'folder', fallback = './')
         createSubfolder = config.getboolean('download', 'create_subfolder', fallback=True)
         
         # Configuración para saber qué ficheros descargar.
