@@ -186,7 +186,7 @@ Dado un trabajo, descarga sus ficheros si es posible.
 @param folder Optativo. Carpeta de destino.
 @param create_subfolder Optativo. Si es True se creará una nueva carpeta para este trabajo.
 '''
-def download_job_files(job, folder = None, create_subfolder = True):
+def download_job_files(job, folder = None, create_subfolder = True, downloadMni = True, downloadNat = True, downloadPdf = True):
     
     # Se comprueba si la descarga está lista.
     if job.state is not 'ready': return
@@ -204,48 +204,9 @@ def download_job_files(job, folder = None, create_subfolder = True):
     if not os.path.exists(folder):
         os.makedirs(folder)
     
-    print(folder + 'mni' + job.job_id +'.zip')
-    urllib.request.urlretrieve(job.links[0], folder + 'mni' + job.job_id +'.zip')
-    urllib.request.urlretrieve(job.links[1], folder + 'nat' + job.job_id +'.zip')
-    urllib.request.urlretrieve(job.links[2], folder + 'pdf' + job.job_id +'.pdf')
+    if downloadMni: urllib.request.urlretrieve(job.links[0], folder + 'mni' + job.job_id +'.zip')
+    if downloadNat: urllib.request.urlretrieve(job.links[1], folder + 'nat' + job.job_id +'.zip')
+    if downloadPdf: urllib.request.urlretrieve(job.links[2], folder + 'pdf' + job.job_id +'.pdf')
 
 
-
-
-
-#############################
-###  PROGRAMA DE PRUEBA  ####
-#############################
-'''
-def main():
-    print("volBrain")
-    session = None
-    base_url = 'http://volbrain.upv.es/'
-    
-    try:
-        session = login(base_url, 'vicrivaz@inf.upv.es', '09081996')
-        #session = login(base_url, 'rafaelspam1234@gmail.com', 'rafaelspam')
-        
-        jobs = get_all_jobs(base_url, session)
-        pages = count_pages(base_url, session)
-        
-        print('Jobs: ', len(jobs), pages, 'pages')
-        for job in jobs:
-            print("'", "'", job.job_id, "'", job.filename, " ", job.date, " ", job.state)
-            for link in job.links:
-                print('\t', link)
-        
-        #if (len(jobs) > 0) :
-        #	   download_job_files(jobs[0], create_subfolder = False)      
-        
-    except LoginException:
-        print("Login error.")
-        exit()
-    
-    
-    
-
-if __name__ == '__main__':
-    main()
-'''
     
