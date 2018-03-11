@@ -103,6 +103,12 @@ class ProcessWindow(QtWidgets.QMainWindow):
         super(ProcessWindow, self).__init__(parent)
         
         
+        self.baseUrl = base_url
+        self.session = session
+        
+        self.taskWidgets = []
+        self.spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        
         # Se crear el JobDownloadManager que se encargará de mantener
         # una cola de descargas en un hilo independiente.
         self.jobDownloadManager = JobDownloadManager()
@@ -114,23 +120,17 @@ class ProcessWindow(QtWidgets.QMainWindow):
         self.ui = Ui_ProcessWindow()
         self.ui.setupUi(self)
         
+        
         # Cargar los trabajos #
-        (jobs, hasNext) = check.get_jobs_in_page(base_url, session)
+        self.currentPage = 1
+        self.pages = check.count_pages(self.baseUrl, self.session)
+        self.updateNavButtons()
+        self.loadJobs()
         
-        self.taskWidgets = []
-        
-        print('init window')
-        
-        for job in jobs: 
-            taskWidget = TaskWidget(job)
-            taskWidget.download.connect(self.downloadJob)
-            self.ui.jobListLayout.addWidget(taskWidget)
-            
-            self.taskWidgets += [taskWidget]
-        
-        self.ui.jobListLayout.addItem(QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding))
-        
+        # Configurar SLOTS
         self.ui.downloadConfigButton.clicked.connect(self.openConfigDownloadDialog)
+        self.ui.nextButton.clicked.connect(self.nextPage)
+        self.ui.previousButton.clicked.connect(self.previousPage)
         
     
     # SLOT. Este slot se ejecuta cuando el usuario solicita la descarga
@@ -150,13 +150,60 @@ class ProcessWindow(QtWidgets.QMainWindow):
                 taskWidget.downloaded()
                 break
     
+    # SLOT.
     def openConfigDownloadDialog(self):
         dialog = ConfigDownloadDialog(self)
         
         if (dialog.exec_() == QDialog.Accepted):
             # Actualizar la configuración.
             self.loadConfig()
+    
+    # SLOT.
+    def nextPage(self):
+        self.currentPage += 1
+        self.updateNavButtons()
+        self.loadJobs()
+    
+    # SLOT.
+    def previousPage(self):
+        self.currentPage -= 1
+        self.updateNavButtons()
+        self.loadJobs()
+    
+    def updateNavButtons(self):
+        if self.currentPage == 1: self.ui.previousButton.setEnabled(False)
+        else: self.ui.previousButton.setEnabled(True)
+
+        if self.currentPage == self.pages: self.ui.nextButton.setEnabled(False)
+        else: self.ui.nextButton.setEnabled(True)
         
+        self.setWindowTitle("Cola de trabajos (" + str(self.currentPage) + '/' + str(self.pages) + ')')
+    
+    # Cargar lista de trabajos.
+    def loadJobs(self):
+        # Cargar la lista de trabajos de la página actual.
+        (jobs, hasNext) = check.get_jobs_in_page(self.baseUrl, self.session, self.currentPage)
+        
+        
+        self.ui.jobListLayout.removeItem(self.spacerItem)
+        
+        # taskWidgets mantiene una lista de los widgets que representan las tareas
+        # y que están siendo mostrados.
+        # Eliminar widgets anteriores.
+        for j in self.taskWidgets: j.setParent(None)
+        self.taskWidgets = []
+        
+        # Se añaden los trabajos a la interfaz.
+        for job in jobs: 
+            taskWidget = TaskWidget(job)
+            taskWidget.download.connect(self.downloadJob)
+            self.ui.jobListLayout.addWidget(taskWidget)
+            
+            self.taskWidgets += [taskWidget]
+        
+
+        self.ui.jobListLayout.addItem(self.spacerItem)
+    
     def loadConfig(self):
         # Cargar la configuración para saber dónde descargar los archivos #
         config = configparser.ConfigParser()

@@ -32,9 +32,9 @@ class Ui_ProcessWindow(object):
         self.previousButton = QtWidgets.QPushButton(self.centralwidget)
         self.previousButton.setObjectName("previousButton")
         self.horizontalLayout_2.addWidget(self.previousButton)
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setObjectName("pushButton")
-        self.horizontalLayout_2.addWidget(self.pushButton)
+        self.nextButton = QtWidgets.QPushButton(self.centralwidget)
+        self.nextButton.setObjectName("nextButton")
+        self.horizontalLayout_2.addWidget(self.nextButton)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem)
         self.downloadPageButton = QtWidgets.QPushButton(self.centralwidget)
@@ -60,7 +60,7 @@ class Ui_ProcessWindow(object):
         _translate = QtCore.QCoreApplication.translate
         ProcessWindow.setWindowTitle(_translate("ProcessWindow", "Cola de trabajos"))
         self.previousButton.setText(_translate("ProcessWindow", "<"))
-        self.pushButton.setText(_translate("ProcessWindow", ">"))
+        self.nextButton.setText(_translate("ProcessWindow", ">"))
         self.downloadPageButton.setText(_translate("ProcessWindow", "Descargar página completa"))
         self.downloadConfigButton.setText(_translate("ProcessWindow", "Configurar descarga"))
 

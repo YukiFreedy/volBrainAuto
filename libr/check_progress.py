@@ -177,7 +177,7 @@ def count_pages(base_url, session):
     
     p = re.compile('javascript:loadJobList\((.+)\).*')
     
-    return p.search(onclick).group(1)
+    return int(p.search(onclick).group(1))
      
 
 '''
