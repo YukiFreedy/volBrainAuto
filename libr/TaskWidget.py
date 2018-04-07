@@ -20,17 +20,26 @@ class TaskWidget(QtWidgets.QWidget):
         
         self.job = job
         
+        self.hideLabels()
+        
         if job.state == 'ready_to_launch':
-            self.ui.readyLabel.hide()
-            self.ui.processingLabel.hide()
+            self.ui.readyToLaunchLabel.show();
         elif job.state == 'ready':
-            self.ui.processingLabel.hide()
-            self.ui.readyToLaunchLabel.hide();
+            self.ui.downloadButton.setEnabled(True)
+            self.ui.readyLabel.show()
         elif job.state == 'launched':
-            self.ui.readyToLaunchLabel.hide()
-            self.ui.readyLabel.hide()
+            self.ui.processingLabel.show();
+        elif job.state == 'deleted':
+            self.ui.deletedLabel.show();
             
         self.ui.downloadButton.clicked.connect(self.requestDownload)
+    
+    def hideLabels(self):    
+        self.ui.downloadButton.setEnabled(False)
+        self.ui.readyLabel.hide()
+        self.ui.processingLabel.hide()
+        self.ui.readyToLaunchLabel.hide();
+        self.ui.deletedLabel.hide();
     
     def getJob(self):
         return self.job

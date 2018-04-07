@@ -29,7 +29,11 @@
          <height>395</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="jobListLayout"/>
+       <layout class="QVBoxLayout" name="jobListLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+       </layout>
       </widget>
      </widget>
     </item>

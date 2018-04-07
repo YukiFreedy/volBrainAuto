@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+   <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -32,6 +32,18 @@
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0,0,0">
+   <property name="leftMargin">
+    <number>3</number>
+   </property>
+   <property name="topMargin">
+    <number>3</number>
+   </property>
+   <property name="rightMargin">
+    <number>3</number>
+   </property>
+   <property name="bottomMargin">
+    <number>3</number>
+   </property>
    <item>
     <widget class="QLabel" name="filename">
      <property name="text">
@@ -56,6 +68,9 @@
      </property>
      <item>
       <widget class="QLabel" name="processingLabel">
+       <property name="toolTip">
+        <string>El trabajo se está procesando y podrá ser descargado en breves.</string>
+       </property>
        <property name="text">
         <string>Procesando...</string>
        </property>
@@ -66,6 +81,9 @@
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="toolTip">
+        <string>El trabajo se ha procesado y puede ser descargado.</string>
+       </property>
        <property name="text">
         <string>Procesado</string>
        </property>
@@ -73,8 +91,21 @@
      </item>
      <item>
       <widget class="QLabel" name="readyToLaunchLabel">
+       <property name="toolTip">
+        <string>El trabajo será procesado.</string>
+       </property>
        <property name="text">
         <string>En la cola</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="deletedLabel">
+       <property name="toolTip">
+        <string>El fichero ha sido eliminado del servidor.</string>
+       </property>
+       <property name="text">
+        <string>Eliminado</string>
        </property>
       </widget>
      </item>

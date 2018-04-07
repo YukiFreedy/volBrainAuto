@@ -109,7 +109,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         self.taskWidgets = []
         self.spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         
-        # Se crear el JobDownloadManager que se encargará de mantener
+        # Se crea el JobDownloadManager que se encargará de mantener
         # una cola de descargas en un hilo independiente.
         self.jobDownloadManager = JobDownloadManager()
         self.jobDownloadManager.downloaded.connect(self.jobDownloaded)
@@ -131,6 +131,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         self.ui.downloadConfigButton.clicked.connect(self.openConfigDownloadDialog)
         self.ui.nextButton.clicked.connect(self.nextPage)
         self.ui.previousButton.clicked.connect(self.previousPage)
+        self.ui.downloadPageButton.clicked.connect(self.downloadPage)
         
     
     # SLOT. Este slot se ejecuta cuando el usuario solicita la descarga
@@ -143,7 +144,19 @@ class ProcessWindow(QtWidgets.QMainWindow):
         # Notificamos al widget que la descarga ha comenzado.
         self.sender().downloading()
     
+    # SLOT. Este slot se ejecuta cuando el usuario solicita la descarga
+    # de la página completa.
+    def downloadPage(self):
+        for tw in self.taskWidgets:
+            job = tw.getJob()
+            if job.state is not 'ready': continue
+            
+            self.jobDownloadManager.addJob(job)
+            tw.downloading()
+    
     # SLOT. Este slot se ejecuta cuando una de las tareas se ha descargado.
+    # El JobDownloader es quien se encarga de descargar los ficheros y, por
+    # tanto, de emitir la señal que ejecutará este slot.
     def jobDownloaded(self, job):
         for taskWidget in self.taskWidgets:
             if (taskWidget.getJob() == job):
@@ -158,19 +171,23 @@ class ProcessWindow(QtWidgets.QMainWindow):
             # Actualizar la configuración.
             self.loadConfig()
     
-    # SLOT.
+    # SLOT. El usuario solicita ver la siguiente página de trabajos.
     def nextPage(self):
         self.currentPage += 1
         self.updateNavButtons()
         self.loadJobs()
     
-    # SLOT.
+    # SLOT. El usuario solicita ver la anterior página de trabajos.
     def previousPage(self):
         self.currentPage -= 1
         self.updateNavButtons()
         self.loadJobs()
     
     def updateNavButtons(self):
+        # Dependiendo de la página en la que se esté será necesario
+        # activar o desactivar los botones de navegación. Si estamos
+        # en la primera página, por ejemplo, se bloque el botón para
+        # ir a la página anterior.
         if self.currentPage == 1: self.ui.previousButton.setEnabled(False)
         else: self.ui.previousButton.setEnabled(True)
 

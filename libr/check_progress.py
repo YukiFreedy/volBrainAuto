@@ -126,6 +126,8 @@ def get_jobs_in_page(base_url, session, page = 1):
             state = 'ready_to_launch'
         elif tds[3].find('img', {'src': 'img/job_launched.png'}) is not None:
             state = 'launched'
+        elif tds[3].find('img', {'src': 'img/job_deleted.png'}) is not None:
+            state = 'deleted'
         else:
             state = 'ready'
         

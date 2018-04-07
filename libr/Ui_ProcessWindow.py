@@ -24,6 +24,7 @@ class Ui_ProcessWindow(object):
         self.jobList.setObjectName("jobList")
         self.jobListLayout = QtWidgets.QVBoxLayout(self.jobList)
         self.jobListLayout.setContentsMargins(0, 0, 0, 0)
+        self.jobListLayout.setSpacing(0)
         self.jobListLayout.setObjectName("jobListLayout")
         self.scrollArea.setWidget(self.jobList)
         self.verticalLayout.addWidget(self.scrollArea)
