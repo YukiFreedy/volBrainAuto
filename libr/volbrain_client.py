@@ -33,7 +33,7 @@ class volBrainClient(QtWidgets.QMainWindow):
     def chooseFile(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(None,"QFileDialog.getOpenFileName()", "","All Files (*);;Python Files (*.py)", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(None,"QFileDialog.getOpenFileName()", "","Zip Files (*.zip)", options=options)
         if fileName:
             currentFiles.append(fileName)
             self.ui.listWidget.addItem(fileName)
