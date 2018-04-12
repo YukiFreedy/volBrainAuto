@@ -32,6 +32,11 @@ class Job:
     def __eq__(self, other_job):
         return other_job.job_id == self.job_id
 
+class FileUpload:
+    def __init__(self, file, genre, age):
+        self.file = file
+        self.genre = genre
+        self.age = age
 
 '''
 CLASE LOGINEXCEPTION
@@ -211,4 +216,31 @@ def download_job_files(job, folder = None, create_subfolder = True, downloadMni 
     if downloadPdf: urllib.request.urlretrieve(job.links[2], folder + 'pdf' + job.job_id +'.pdf')
 
 
-    
+def upload_job(url, session, uploadFiles):
+
+    r = session.get(url + "members.php")
+
+    # get the response page after loggin in
+    c = r.content
+    soup = BeautifulSoup(c, "lxml")
+
+    # select the upload form
+    form = soup.find(id="upload_form")
+
+    # check if the form exist, if not, it means something went wrong. Probably, the data is incorrect
+    if form is None:
+        print("wrong user information")
+        sys.exit(0)
+    next_page = form["action"]
+
+    for file in uploadFiles:
+        image_form = {"pipeline": "1", #cambiar
+                    "patientssex": file.genre, "patientsage": str(file.age)}
+
+        with open(file.file, 'rb') as file_to_upload:
+        # as we need to provide the info about the files upload apart, we build now the regarding dictionary
+            upload_files = {"uploaded_file": file_to_upload}
+
+            # send the petition to upload the fhe file
+            r = s.post(url + next_page, files=upload_files, data=image_form)
+

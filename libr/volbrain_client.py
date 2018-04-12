@@ -8,6 +8,10 @@ from Ui_Login import Ui_Login
 import ProcessWindow
 import check_progress as check
 
+from FileWidget import FileWidget
+
+from check_progress import FileUpload
+
 
 def getFiles():
     return []
@@ -17,7 +21,7 @@ currentFiles = []
 ### VENTANA PRINCIPAL ###
 class volBrainClient(QtWidgets.QMainWindow):
 
-    def __init__(self, base_url, session, parent=None):
+    def __init__(self, base_url, session, email, password, parent=None):
         super(volBrainClient, self).__init__(parent)
         
         self.session = session
@@ -29,6 +33,19 @@ class volBrainClient(QtWidgets.QMainWindow):
         self.ui.selectFilesButton.clicked.connect(self.chooseFile)
         self.ui.cleanButton.clicked.connect(self.cleanList)
         self.ui.showJobsButton.clicked.connect(self.openProcessWindow)
+        self.ui.uploadFilesButton.clicked.connect(self.uploadSelected)
+
+        self.email = email
+        self.password = password
+        
+        self.fileWidgets = []
+
+    def uploadSelected(self):
+        files = []
+        for w in self.fileWidgets:
+            if(w.getChecked()):
+                files += [FileUpload(w.getFile(), w.getGenre(), w.getAge())]
+        check.upload_job(self.base_url, self.session, files)
         
     def chooseFile(self):
         options = QFileDialog.Options()
@@ -36,11 +53,17 @@ class volBrainClient(QtWidgets.QMainWindow):
         fileName, _ = QFileDialog.getOpenFileName(None,"QFileDialog.getOpenFileName()", "","Zip Files (*.zip)", options=options)
         if fileName:
             currentFiles.append(fileName)
-            self.ui.listWidget.addItem(fileName)
+            self.fileWidgets += [FileWidget(fileName)]
+            for w in self.fileWidgets:
+                self.ui.jobListLayout.removeWidget(w)
+            for w in self.fileWidgets:
+                self.ui.jobListLayout.addWidget(w)
 
     def cleanList(self):
-        currentFiles = []
-        self.ui.listWidget.clear()
+        currentFiles.clear()
+        for w in self.fileWidgets:
+            self.jobListLayout.removeWidget(w)
+        self.fileWidgets = []
 
     def openProcessWindow(self):
         self.win = ProcessWindow.ProcessWindow(self.base_url, self.session)
@@ -91,7 +114,7 @@ def main():
             login.showError(True)
 
     if not rejected:
-        form = volBrainClient(base_url, session)
+        form = volBrainClient(base_url, session, email, password)
         form.show()
         res = app.exec_()
 
