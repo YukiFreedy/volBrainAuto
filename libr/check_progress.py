@@ -200,16 +200,18 @@ def download_job_files(job, folder = None, create_subfolder = True, downloadMni 
     
     # La carpeta de destino, por defecto, es la carpeta
     # donde se ejecuta el script.
-    if folder is None: folder = './'
+    if folder is None: folder = os.path.join(os.getcwd(), '')
+    else: folder = os.path.join(folder, '')
     
     # El usuario puede establecer si crear una subcarpeta por
     # cada trabajo o si prefiere meter todos los ficheros en
     # la misma carpeta.
     if create_subfolder:
-        folder += 'job_' + job.job_id + '/'
+        folder += os.path.join('job_' + job.job_id, '')
 
     if not os.path.exists(folder):
         os.makedirs(folder)
+    
     
     if downloadMni: urllib.request.urlretrieve(job.links[0], folder + 'mni' + job.job_id +'.zip')
     if downloadNat: urllib.request.urlretrieve(job.links[1], folder + 'nat' + job.job_id +'.zip')

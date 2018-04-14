@@ -1,10 +1,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtWidgets import QDialogButtonBox, QDialog
+from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QFileDialog
 from Ui_ProcessWindow import Ui_ProcessWindow
 from Ui_ConfigDownloadDialog import Ui_ConfigDownloadDialog
 import threading
+import os
 
 from TaskWidget import TaskWidget
 import check_progress as check
@@ -52,7 +53,6 @@ class JobDownloadManager(QtCore.QObject):
     def addJob(self, job):
         if job in self.pendant: return
         
-        print('AddJob...')
         self.pendant += [job]
         
         if not self.running:
@@ -73,7 +73,9 @@ class ConfigDownloadDialog(QtWidgets.QDialog):
         self.config = configparser.ConfigParser()
         self.config.read('config.ini')
         
-        self.ui.targetFolderLabel.setText(self.config.get('download', 'folder', fallback = './'))
+        self.ui.targetFolderLabel.setText(self.config.get('download', 'folder', fallback = os.getcwd()))
+        self.ui.targetFolderBtn.clicked.connect(self.openFolderDialog)
+        
         self.ui.createSubfolderCheckbox.setChecked(self.config.getboolean('download', 'create_subfolder', fallback=True))
         
         self.ui.downloadMniCheckbox.setChecked(self.config.getboolean('download', 'download_mni', fallback = True))
@@ -81,6 +83,11 @@ class ConfigDownloadDialog(QtWidgets.QDialog):
         self.ui.downloadPdfCheckbox.setChecked(self.config.getboolean('download', 'download_pdf', fallback = True))
         
         self.ui.buttonBox.accepted.connect(self.save)
+    
+    def openFolderDialog(self):
+        folder = str(QFileDialog.getExistingDirectory(self, "Selecciona una carpeta de destino"))
+        if (folder is not ''):
+            self.ui.targetFolderLabel.setText(os.path.join(folder, ''))
     
     def save(self):
         self.config['download'] = {}
@@ -225,7 +232,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         # Cargar la configuración para saber dónde descargar los archivos #
         config = configparser.ConfigParser()
         config.read('config.ini')
-        folder = config.get('download', 'folder', fallback = './')
+        folder = config.get('download', 'folder', fallback = os.getcwd())
         createSubfolder = config.getboolean('download', 'create_subfolder', fallback=True)
         
         # Configuración para saber qué ficheros descargar.
