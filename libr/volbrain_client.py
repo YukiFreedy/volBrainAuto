@@ -28,6 +28,8 @@ class volBrainClient(QtWidgets.QMainWindow):
         self.session = session
         self.base_url = base_url
         
+        self.spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -59,13 +61,15 @@ class volBrainClient(QtWidgets.QMainWindow):
     def chooseFile(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(None,"QFileDialog.getOpenFileName()", "","Zip Files (*.zip)", options=options)
+        fileName, _ = QFileDialog.getOpenFileName(None,"Selecciona un fichero", "","Zip Files (*.zip)", options=options)
         if fileName:
+            self.ui.jobListLayout.removeItem(self.spacerItem)
             self.fileWidgets += [FileWidget(fileName)]
             for w in self.fileWidgets:
                 w.setParent(None)
             for w in self.fileWidgets:
                 self.ui.jobListLayout.addWidget(w)
+            self.ui.jobListLayout.addItem(self.spacerItem)
 
     def cleanList(self):
         for w in self.fileWidgets:
