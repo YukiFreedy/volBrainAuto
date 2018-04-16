@@ -14,11 +14,13 @@ class FileWidget(QtWidgets.QWidget):
 
         self.file = file
 
+        self.ui.checkUpload.setChecked(True)
+
     def getGenre(self):
         if(self.ui.radioMan.isChecked):
-            return "M"
+            return "Male"
         else:
-            return "F"
+            return "Female"
 
     def getFile(self):
         return self.file

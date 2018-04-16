@@ -236,13 +236,21 @@ def upload_job(url, session, uploadFiles):
     next_page = form["action"]
 
     for file in uploadFiles:
-        image_form = {"pipeline": "1", #cambiar
+        print("Genre: " + file.genre)
+        print("Age: " + str(file.age))
+        image_form = {"pipeline": "1",
                     "patientssex": file.genre, "patientsage": str(file.age)}
 
         with open(file.file, 'rb') as file_to_upload:
-        # as we need to provide the info about the files upload apart, we build now the regarding dictionary
-            upload_files = {"uploaded_file": file_to_upload}
+            # as we need to provide the info about the files upload apart, we build now the regarding dictionary
+            upload_files = {"volbrain_t1_file": file_to_upload}
 
             # send the petition to upload the fhe file
-            r = s.post(url + next_page, files=upload_files, data=image_form)
+            r = session.post(url + next_page, files=upload_files, data=image_form)
+
+            c = r.content
+            soup = BeautifulSoup(c, "lxml")
+
+            form = soup.find(id="upload_form")
+            next_page = form["action"]
 

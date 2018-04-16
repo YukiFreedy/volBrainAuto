@@ -62,7 +62,7 @@ class volBrainClient(QtWidgets.QMainWindow):
     def cleanList(self):
         currentFiles.clear()
         for w in self.fileWidgets:
-            self.jobListLayout.removeWidget(w)
+            self.ui.jobListLayout.removeWidget(w)
         self.fileWidgets = []
 
     def openProcessWindow(self):
