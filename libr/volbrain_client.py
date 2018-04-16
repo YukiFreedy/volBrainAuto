@@ -12,11 +12,12 @@ from FileWidget import FileWidget
 
 from check_progress import FileUpload
 
+import threading
+
 
 def getFiles():
     return []
 
-currentFiles = []
 
 ### VENTANA PRINCIPAL ###
 class volBrainClient(QtWidgets.QMainWindow):
@@ -44,25 +45,31 @@ class volBrainClient(QtWidgets.QMainWindow):
         files = []
         for w in self.fileWidgets:
             if(w.getChecked()):
-                files += [FileUpload(w.getFile(), w.getGenre(), w.getAge())]
-        check.upload_job(self.base_url, self.session, files)
+                files += [FileUpload(w.getFile(), w.getGenre(), w.getAge(), w.getPipeline())]
+        self.upload(files)
+
+    def upload(self, files):
+        self.running = True
+        self.thread = threading.Thread(target = self.work(files))
+        self.thread.start()
         
+    def work(self, files):
+        check.upload_job(self.base_url, self.session, files)
+
     def chooseFile(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(None,"QFileDialog.getOpenFileName()", "","Zip Files (*.zip)", options=options)
         if fileName:
-            currentFiles.append(fileName)
             self.fileWidgets += [FileWidget(fileName)]
             for w in self.fileWidgets:
-                self.ui.jobListLayout.removeWidget(w)
+                w.setParent(None)
             for w in self.fileWidgets:
                 self.ui.jobListLayout.addWidget(w)
 
     def cleanList(self):
-        currentFiles.clear()
         for w in self.fileWidgets:
-            self.ui.jobListLayout.removeWidget(w)
+            w.setParent(None)
         self.fileWidgets = []
 
     def openProcessWindow(self):

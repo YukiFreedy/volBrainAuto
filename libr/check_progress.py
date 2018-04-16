@@ -33,10 +33,11 @@ class Job:
         return other_job.job_id == self.job_id
 
 class FileUpload:
-    def __init__(self, file, genre, age):
+    def __init__(self, file, genre, age, pipeline):
         self.file = file
         self.genre = genre
         self.age = age
+        self.pipeline = pipeline
 
 '''
 CLASE LOGINEXCEPTION
@@ -238,8 +239,8 @@ def upload_job(url, session, uploadFiles):
     for file in uploadFiles:
         print("Genre: " + file.genre)
         print("Age: " + str(file.age))
-        image_form = {"pipeline": "1",
-                    "patientssex": file.genre, "patientsage": str(file.age)}
+        image_form = {"pipeline": file.pipeline,
+                    "patientssex": file.genre, "patientsage": file.age}
 
         with open(file.file, 'rb') as file_to_upload:
             # as we need to provide the info about the files upload apart, we build now the regarding dictionary
