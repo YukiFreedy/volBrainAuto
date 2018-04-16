@@ -6,11 +6,11 @@ from Ui_MainWindow import Ui_MainWindow
 from Ui_Login import Ui_Login
 
 import ProcessWindow
-import check_progress as check
+import volbrainlib as volbrain
 
 from FileWidget import FileWidget
 
-from check_progress import FileUpload
+from volbrainlib import FileUpload
 
 import threading
 
@@ -56,7 +56,7 @@ class volBrainClient(QtWidgets.QMainWindow):
         self.thread.start()
         
     def work(self, files):
-        check.upload_job(self.base_url, self.session, files)
+        volbrain.upload_job(self.base_url, self.session, files)
 
     def chooseFile(self):
         options = QFileDialog.Options()
@@ -118,10 +118,10 @@ def main():
         (email, password) = login.getLogin()
 
         try:
-            session = check.login(base_url, email, password)
+            session = volbrain.login(base_url, email, password)
             loginOk = True
             login.showError(False)
-        except check.LoginException:
+        except volbrain.LoginException:
             login.showError(True)
 
     if not rejected:

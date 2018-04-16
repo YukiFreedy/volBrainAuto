@@ -3,105 +3,13 @@ from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QFileDialog
 from Ui_ProcessWindow import Ui_ProcessWindow
-from Ui_ConfigDownloadDialog import Ui_ConfigDownloadDialog
-import threading
 import os
 
 from TaskWidget import TaskWidget
-import check_progress as check
+import volbrainlib as volbrain
 import configparser
-
-# Esta clase auxiliar sirve para gestionar la descarga de archivos
-# en un hilo a parte para evitar que se congele la interfaz.
-class JobDownloadManager(QtCore.QObject):
-    # El manager enviará una señal cuando la descarga de un trabajo
-    # haya terminado. Mandará como parámetro el trabajo.
-    downloaded = pyqtSignal(check.Job)
-    
-    def __init__(self, folder = None, createSubfolder = True, downloadMni = True, downloadNat = True, downloadPdf = True):
-        super(JobDownloadManager, self).__init__()
-        self.pendant = []
-        self.running = False
-        self.setConfig(folder, createSubfolder, downloadMni, downloadNat, downloadPdf)
-    
-    def setConfig(self, folder, createSubfolder, downloadMni, downloadNat, downloadPdf):
-        self.folder = folder
-        self.createSubfolder = createSubfolder
-        
-        self.downloadMni = downloadMni
-        self.downloadNat = downloadNat
-        self.downloadPdf = downloadPdf
-    
-    def startThread(self):
-        if self.running: return
-        
-        self.running = True
-        self.thread = threading.Thread(target = self.work)
-        self.thread.start()
-        
-    def work(self):
-        print('Thread started')
-        while self.pendant:
-            job = self.pendant.pop(0)
-            print('Downloading: ' + job.filename)
-            check.download_job_files(job, self.folder, self.createSubfolder, self.downloadMni, self.downloadNat, self.downloadPdf)
-            print('Downloaded: ' + job.filename)
-            self.downloaded.emit(job)
-        self.running = False
-        print('Thread finished')
-        
-    def addJob(self, job):
-        if job in self.pendant: return
-        
-        self.pendant += [job]
-        
-        if not self.running:
-            self.startThread()
-            
-    def isDownloading(self):
-        return self.running
-        
-
-## DIALOGO DE CONFIGURACION DE LA DESCARGA ##        
-class ConfigDownloadDialog(QtWidgets.QDialog):
-    def __init__(self, parent = None):
-        super(ConfigDownloadDialog, self).__init__(parent)
-        
-        self.ui = Ui_ConfigDownloadDialog()
-        self.ui.setupUi(self)
-        
-        self.config = configparser.ConfigParser()
-        self.config.read('config.ini')
-        
-        self.ui.targetFolderLabel.setText(self.config.get('download', 'folder', fallback = os.getcwd()))
-        self.ui.targetFolderBtn.clicked.connect(self.openFolderDialog)
-        
-        self.ui.createSubfolderCheckbox.setChecked(self.config.getboolean('download', 'create_subfolder', fallback=True))
-        
-        self.ui.downloadMniCheckbox.setChecked(self.config.getboolean('download', 'download_mni', fallback = True))
-        self.ui.downloadNatCheckbox.setChecked(self.config.getboolean('download', 'download_nat', fallback = True))
-        self.ui.downloadPdfCheckbox.setChecked(self.config.getboolean('download', 'download_pdf', fallback = True))
-        
-        self.ui.buttonBox.accepted.connect(self.save)
-    
-    def openFolderDialog(self):
-        folder = str(QFileDialog.getExistingDirectory(self, "Selecciona una carpeta de destino"))
-        if (folder is not ''):
-            self.ui.targetFolderLabel.setText(os.path.join(folder, ''))
-    
-    def save(self):
-        self.config['download'] = {}
-        self.config['download']['folder'] = self.ui.targetFolderLabel.text()
-        self.config['download']['create_subfolder'] = str(self.ui.createSubfolderCheckbox.isChecked())
-        
-        self.config['download']['download_mni'] = str(self.ui.downloadMniCheckbox.isChecked())
-        self.config['download']['download_nat'] = str(self.ui.downloadNatCheckbox.isChecked())
-        self.config['download']['download_pdf'] = str(self.ui.downloadPdfCheckbox.isChecked())
-        
-        with open('config.ini', 'w') as configfile:
-            self.config.write(configfile)
-    
-
+import JobDownloadManager
+import ConfigDownloadDialog
 
 ## VENTANA DE FILE PROGRESS ##
 class ProcessWindow(QtWidgets.QMainWindow):
@@ -118,7 +26,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         
         # Se crea el JobDownloadManager que se encargará de mantener
         # una cola de descargas en un hilo independiente.
-        self.jobDownloadManager = JobDownloadManager()
+        self.jobDownloadManager = JobDownloadManager.JobDownloadManager()
         self.jobDownloadManager.downloaded.connect(self.jobDownloaded)
         
         self.loadConfig()
@@ -130,7 +38,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         
         # Cargar los trabajos #
         self.currentPage = 1
-        self.pages = check.count_pages(self.baseUrl, self.session)
+        self.pages = volbrain.count_pages(self.baseUrl, self.session)
         self.updateNavButtons()
         self.loadJobs()
         
@@ -172,7 +80,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
     
     # SLOT.
     def openConfigDownloadDialog(self):
-        dialog = ConfigDownloadDialog(self)
+        dialog = ConfigDownloadDialog.ConfigDownloadDialog(self)
         
         if (dialog.exec_() == QDialog.Accepted):
             # Actualizar la configuración.
@@ -206,7 +114,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
     # Cargar lista de trabajos.
     def loadJobs(self):
         # Cargar la lista de trabajos de la página actual.
-        (jobs, hasNext) = check.get_jobs_in_page(self.baseUrl, self.session, self.currentPage)
+        (jobs, hasNext) = volbrain.get_jobs_in_page(self.baseUrl, self.session, self.currentPage)
         
         
         self.ui.jobListLayout.removeItem(self.spacerItem)
