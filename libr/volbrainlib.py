@@ -75,10 +75,11 @@ def login(base_url, email, password):
     c = r.content
     soup = BeautifulSoup(c, "lxml")
 
-    form = soup.find(id="upload_form")
+    form = soup.find(id="job_list")
     
-    # Si en la página no hay un formulario significa que
-    # el login no ha ido bien.    
+    # Si en la página no hay una job_list significa
+    # que no ha habido éxito al iniciar sesión.
+     
     if form is None: raise LoginException()
     
     # Se devuelve el objeto session para poder lanzar nuevas
@@ -140,6 +141,8 @@ def get_jobs_in_page(base_url, session, page = 1):
             state = 'launched'
         elif tds[3].find('img', {'src': 'img/job_deleted.png'}) is not None:
             state = 'deleted'
+        elif tds[3].find('img', {'src': 'img/job_error.png'}) is not None:
+            state = 'error'
         else:
             state = 'ready'
         

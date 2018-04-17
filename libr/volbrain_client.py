@@ -51,7 +51,12 @@ class volBrainClient(QtWidgets.QMainWindow):
         for w in self.fileWidgets:
             if(w.getChecked()):
                 files += [FileUpload(w.getFile(), w.getGenre(), w.getAge(), w.getPipeline())]
-        self.upload(files)
+        
+        if len(files) > 0:
+            self.upload(files)
+            self.cleanList()
+        else:
+            QMessageBox.information(self, 'Selecciona un fichero.', "No hay ningún fichero pendiente por subir. Selecciona alguno.", QMessageBox.Ok, QMessageBox.Ok)
 
     def upload(self, files):
         self.running = True
@@ -59,8 +64,9 @@ class volBrainClient(QtWidgets.QMainWindow):
         self.thread.start()
         
     def work(self, files):
+        QMessageBox.information(self, 'Cargando.', "Los archivos han comenzado a cargarse.", QMessageBox.Ok, QMessageBox.Ok)
         volbrain.upload_job(self.base_url, self.session, files)
-        QMessageBox.question(self, 'Completado', "Los archivos se han subido correctamente", QMessageBox.Discard, QMessageBox.Discard)
+        QMessageBox.information(self, 'Completado', "Los archivos se han subido correctamente", QMessageBox.Ok, QMessageBox.Ok)
 
     def chooseFile(self):
         options = QFileDialog.Options()
