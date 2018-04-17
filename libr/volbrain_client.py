@@ -40,6 +40,11 @@ class volBrainClient(QtWidgets.QMainWindow):
         self.ui.cleanButton.clicked.connect(self.cleanList)
         self.ui.showJobsButton.clicked.connect(self.openProcessWindow)
         self.ui.uploadFilesButton.clicked.connect(self.uploadSelected)
+        
+        if (volbrain.upload_limit_reached(base_url, session)):
+            self.disableUpload()
+        else:
+            self.ui.uploadLimitReachedLabel.hide();
 
         self.email = email
         self.password = password
@@ -64,9 +69,15 @@ class volBrainClient(QtWidgets.QMainWindow):
         self.thread.start()
         
     def work(self, files):
-        QMessageBox.information(self, 'Cargando.', "Los archivos han comenzado a cargarse.", QMessageBox.Ok, QMessageBox.Ok)
-        volbrain.upload_job(self.base_url, self.session, files)
-        QMessageBox.information(self, 'Completado', "Los archivos se han subido correctamente", QMessageBox.Ok, QMessageBox.Ok)
+        QMessageBox.information(None, 'Cargando.', "Los archivos han comenzado a cargarse.", QMessageBox.Ok, QMessageBox.Ok)
+        uploaded = volbrain.upload_job(self.base_url, self.session, files)
+        if uploaded == len(files):
+            QMessageBox.information(None, 'Completado', "Los archivos se han subido correctamente.", QMessageBox.Ok, QMessageBox.Ok)
+        else:
+            QMessageBox.warning(None, 'Error', "Ha habido un problema al cargar algún fichero. Quizá hayas superado el límite diario. Subidos " + str(uploaded) + "/" + str(len(files)) + ".", QMessageBox.Ok, QMessageBox.Ok)
+            
+            
+            
 
     def chooseFile(self):
         options = QFileDialog.Options()
@@ -89,6 +100,15 @@ class volBrainClient(QtWidgets.QMainWindow):
     def openProcessWindow(self):
         self.win = ProcessWindow.ProcessWindow(self.base_url, self.session)
         self.win.show()
+        
+    '''
+    Se deshabilita la subida si el usuario ha alcanzado el límite.
+    '''
+    def disableUpload(self):
+        self.ui.uploadLimitReachedLabel.show()
+        self.ui.selectFilesButton.setEnabled(False)
+        self.ui.uploadFilesButton.setEnabled(False)
+        
 
 ## VENTANA DE LOGIN ##
 class LoginDialog(QtWidgets.QDialog):

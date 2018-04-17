@@ -23,14 +23,16 @@ class TaskWidget(QtWidgets.QWidget):
         self.hideLabels()
         
         if job.state == 'ready_to_launch':
-            self.ui.readyToLaunchLabel.show();
+            self.ui.readyToLaunchLabel.show()
         elif job.state == 'ready':
             self.ui.downloadButton.setEnabled(True)
             self.ui.readyLabel.show()
         elif job.state == 'launched':
-            self.ui.processingLabel.show();
+            self.ui.processingLabel.show()
         elif job.state == 'deleted':
-            self.ui.deletedLabel.show();
+            self.ui.deletedLabel.show()
+        elif job.state == 'error':
+            self.ui.errorLabel.show()
             
         self.ui.downloadButton.clicked.connect(self.requestDownload)
     
@@ -40,6 +42,7 @@ class TaskWidget(QtWidgets.QWidget):
         self.ui.processingLabel.hide()
         self.ui.readyToLaunchLabel.hide();
         self.ui.deletedLabel.hide();
+        self.ui.errorLabel.hide();
     
     def getJob(self):
         return self.job

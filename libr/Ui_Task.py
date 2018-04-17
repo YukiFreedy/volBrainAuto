@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui/task.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -38,6 +38,9 @@ class Ui_Task(object):
         self.readyLabel.setEnabled(True)
         self.readyLabel.setObjectName("readyLabel")
         self.verticalLayout.addWidget(self.readyLabel)
+        self.errorLabel = QtWidgets.QLabel(Task)
+        self.errorLabel.setObjectName("errorLabel")
+        self.verticalLayout.addWidget(self.errorLabel)
         self.readyToLaunchLabel = QtWidgets.QLabel(Task)
         self.readyToLaunchLabel.setObjectName("readyToLaunchLabel")
         self.verticalLayout.addWidget(self.readyToLaunchLabel)
@@ -48,7 +51,8 @@ class Ui_Task(object):
         self.downloadButton = QtWidgets.QPushButton(Task)
         self.downloadButton.setObjectName("downloadButton")
         self.horizontalLayout.addWidget(self.downloadButton)
-        self.horizontalLayout.setStretch(0, 1)
+        self.horizontalLayout.setStretch(0, 2)
+        self.horizontalLayout.setStretch(2, 1)
 
         self.retranslateUi(Task)
         QtCore.QMetaObject.connectSlotsByName(Task)
@@ -62,6 +66,7 @@ class Ui_Task(object):
         self.processingLabel.setText(_translate("Task", "Procesando..."))
         self.readyLabel.setToolTip(_translate("Task", "El trabajo se ha procesado y puede ser descargado."))
         self.readyLabel.setText(_translate("Task", "Procesado"))
+        self.errorLabel.setText(_translate("Task", "Error"))
         self.readyToLaunchLabel.setToolTip(_translate("Task", "El trabajo será procesado."))
         self.readyToLaunchLabel.setText(_translate("Task", "En la cola"))
         self.deletedLabel.setToolTip(_translate("Task", "El fichero ha sido eliminado del servidor."))

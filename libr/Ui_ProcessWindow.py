@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui/processwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.1
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -23,6 +23,7 @@ class Ui_ProcessWindow(object):
         self.jobList.setGeometry(QtCore.QRect(0, 0, 761, 395))
         self.jobList.setObjectName("jobList")
         self.jobListLayout = QtWidgets.QVBoxLayout(self.jobList)
+        self.jobListLayout.setContentsMargins(0, 0, 0, 0)
         self.jobListLayout.setSpacing(0)
         self.jobListLayout.setObjectName("jobListLayout")
         self.scrollArea.setWidget(self.jobList)

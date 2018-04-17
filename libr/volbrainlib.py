@@ -198,6 +198,22 @@ def count_pages(base_url, session):
      
 
 '''
+Devuelve true si se ha alcanzado el límite de trabajos subidos.
+'''
+def upload_limit_reached(base_url, session):
+    r = session.get(base_url + "members.php")
+
+    # get the response page after loggin in
+    c = r.content
+    soup = BeautifulSoup(c, "lxml")
+
+    # select the upload form
+    form = soup.find(id="upload_form")
+    
+    return form is None
+
+
+'''
 Dado un trabajo, descarga sus ficheros si es posible.
 @param job Trabajo (instancia de Job).
 @param folder Optativo. Carpeta de destino.
@@ -244,17 +260,19 @@ def upload_job(url, session, uploadFiles):
         print("wrong user information")
         sys.exit(0)
     next_page = form["action"]
+    
+    uploaded_counter = 0
 
     for file in uploadFiles:
-        print("Genre: " + file.genre)
-        print("Age: " + str(file.age))
+    
+        pipeline_str = 'volbrain' if file.pipeline == 1 else 'ceres'
 
         image_form = {"pipeline": file.pipeline,
-                    "patientssex": file.genre, "patientsage": file.age}
+                    pipeline_str + "_patientssex": file.genre, pipeline_str + "_patientsage": file.age}
         
         with open(file.file, 'rb') as file_to_upload:
             # as we need to provide the info about the files upload apart, we build now the regarding dictionary
-            upload_files = {"volbrain_t1_file": file_to_upload}
+            upload_files = { pipeline_str + "_t1_file": file_to_upload}
 
             # send the petition to upload the fhe file
             r = session.post(url + next_page, files=upload_files, data=image_form)
@@ -262,6 +280,10 @@ def upload_job(url, session, uploadFiles):
             c = r.content
             soup = BeautifulSoup(c, "lxml")
 
+            uploaded_counter += 1
+
             form = soup.find(id="upload_form")
-            next_page = form["action"]
+            if form is None: break
+            #next_page = form["action"]
+    return uploaded_counter
 
