@@ -82,15 +82,18 @@ class volBrainClient(QtWidgets.QMainWindow):
     def chooseFile(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        fileName, _ = QFileDialog.getOpenFileName(None,"Selecciona un fichero", "","Zip Files (*.zip)", options=options)
-        if fileName:
+        (fileNames, _) = QFileDialog.getOpenFileNames(None,"Selecciona un fichero", "","Zip Files (*.zip)", options=options)
+        print(fileNames)
+        
+        if len(fileNames) > 0:
             self.ui.jobListLayout.removeItem(self.spacerItem)
-            self.fileWidgets += [FileWidget(fileName)]
-            for w in self.fileWidgets:
-                w.setParent(None)
-            for w in self.fileWidgets:
+            for fileName in fileNames:
+                w = FileWidget(fileName)
+                self.fileWidgets += [w]
                 self.ui.jobListLayout.addWidget(w)
+            
             self.ui.jobListLayout.addItem(self.spacerItem)
+        
 
     def cleanList(self):
         for w in self.fileWidgets:
