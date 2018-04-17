@@ -239,9 +239,10 @@ def upload_job(url, session, uploadFiles):
     for file in uploadFiles:
         print("Genre: " + file.genre)
         print("Age: " + str(file.age))
+
         image_form = {"pipeline": file.pipeline,
                     "patientssex": file.genre, "patientsage": file.age}
-
+        
         with open(file.file, 'rb') as file_to_upload:
             # as we need to provide the info about the files upload apart, we build now the regarding dictionary
             upload_files = {"volbrain_t1_file": file_to_upload}

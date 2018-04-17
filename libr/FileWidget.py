@@ -32,7 +32,7 @@ class FileWidget(QtWidgets.QWidget):
         self.ui.ceresCheck.setChecked(True)
 
     def getGenre(self):
-        if(self.ui.radioMan.isChecked):
+        if(self.ui.radioMan.isChecked()):
             return "Male"
         else:
             return "Female"
@@ -41,10 +41,10 @@ class FileWidget(QtWidgets.QWidget):
         return self.file
 
     def getChecked(self):
-        return self.ui.checkUpload.isChecked
+        return self.ui.checkUpload.isChecked()
 
     def getAge(self):
-        return self.ui.lineEdit.text
+        return self.ui.lineEdit.text()
 
     def getPipeline(self):
         if self.ui.volCheck.isChecked():

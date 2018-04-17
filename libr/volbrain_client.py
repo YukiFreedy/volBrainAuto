@@ -50,11 +50,13 @@ class volBrainClient(QtWidgets.QMainWindow):
 
     def upload(self, files):
         self.running = True
-        self.thread = threading.Thread(target = self.work(files))
+        self.thread = threading.Thread(target = self.work, args=(files,))
         self.thread.start()
         
     def work(self, files):
+        print('Thread started')
         check.upload_job(self.base_url, self.session, files)
+        print('Thread finished')
 
     def chooseFile(self):
         options = QFileDialog.Options()
