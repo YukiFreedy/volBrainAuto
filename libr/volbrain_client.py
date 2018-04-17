@@ -1,5 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox
+from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import pyqtSlot
 import sys
 
 from Ui_MainWindow import Ui_MainWindow
@@ -57,6 +60,7 @@ class volBrainClient(QtWidgets.QMainWindow):
         
     def work(self, files):
         volbrain.upload_job(self.base_url, self.session, files)
+        QMessageBox.question(self, 'Completado', "Los archivos se han subido correctamente", QMessageBox.Discard, QMessageBox.Discard)
 
     def chooseFile(self):
         options = QFileDialog.Options()
@@ -79,7 +83,6 @@ class volBrainClient(QtWidgets.QMainWindow):
     def openProcessWindow(self):
         self.win = ProcessWindow.ProcessWindow(self.base_url, self.session)
         self.win.show()
-
 
 ## VENTANA DE LOGIN ##
 class LoginDialog(QtWidgets.QDialog):
