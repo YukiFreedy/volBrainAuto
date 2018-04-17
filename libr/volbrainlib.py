@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+##################################################
+# Este fichero contiene un conjunto de funciones #
+# y clases para interactuar con la web de        #
+# volBrain.                                      #
+##################################################
+
 import sys
 import os
 import re

@@ -2,12 +2,12 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from Ui_Task import Ui_Task
 
-import check_progress as check
+import volbrainlib as volbrain
 
 class TaskWidget(QtWidgets.QWidget):
     
-    view = pyqtSignal(check.Job)
-    download = pyqtSignal(check.Job)
+    view = pyqtSignal(volbrain.Job)
+    download = pyqtSignal(volbrain.Job)
     
     def __init__(self, job, parent=None):
         super(TaskWidget, self).__init__(parent)
