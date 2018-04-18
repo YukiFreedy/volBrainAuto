@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, QTimer
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QFileDialog
 from Ui_ProcessWindow import Ui_ProcessWindow
@@ -41,6 +41,12 @@ class ProcessWindow(QtWidgets.QMainWindow):
         self.pages = volbrain.count_pages(self.baseUrl, self.session)
         self.updateNavButtons()
         self.loadJobs()
+        
+        # Timer para recargar la página automáticamente #
+        self.reloadTimer = QTimer()
+        self.reloadTimer.setInterval(60000)
+        self.reloadTimer.timeout.connect(self.loadJobs)
+        self.reloadTimer.start()
         
         # Configurar SLOTS
         self.ui.downloadConfigButton.clicked.connect(self.openConfigDownloadDialog)
@@ -152,6 +158,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         self.jobDownloadManager.setConfig(folder, createSubfolder, downloadMni, downloadNat, downloadPdf)
         
     def closeEvent(self, event):
+        self.reloadTimer.stop()
         if self.jobDownloadManager.isDownloading():
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Warning)
