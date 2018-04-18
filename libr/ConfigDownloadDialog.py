@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QDialog, QFileDialog
 from PyQt5.QtCore import pyqtSignal
 from Ui_ConfigDownloadDialog import Ui_ConfigDownloadDialog
 

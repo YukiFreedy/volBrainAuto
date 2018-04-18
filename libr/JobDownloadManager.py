@@ -1,5 +1,6 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import pyqtSignal
+import threading
 import volbrainlib as volbrain
 
 # Esta clase auxiliar sirve para gestionar la descarga de archivos

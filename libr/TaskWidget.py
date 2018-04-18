@@ -62,5 +62,5 @@ class TaskWidget(QtWidgets.QWidget):
     # Este método sirve para notificar al TaskWidget que el trabajo
     # que representa ha sido descargado.
     def downloaded(self):
-        self.ui.downloadButton.setText("Descargado")
-        self.ui.downloadButton.setEnabled(False)
+        self.ui.downloadButton.setText("Descargar")
+        self.ui.downloadButton.setEnabled(True)

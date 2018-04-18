@@ -44,7 +44,7 @@ class ProcessWindow(QtWidgets.QMainWindow):
         
         # Timer para recargar la página automáticamente #
         self.reloadTimer = QTimer()
-        self.reloadTimer.setInterval(60000)
+        self.reloadTimer.setInterval(4 * 60000)
         self.reloadTimer.timeout.connect(self.loadJobs)
         self.reloadTimer.start()
         
