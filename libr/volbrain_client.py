@@ -14,6 +14,7 @@ import volbrainlib as volbrain
 from FileWidget import FileWidget
 
 from volbrainlib import FileUpload
+from JobUploadManager import JobUploadManager
 
 import threading
 
@@ -30,6 +31,9 @@ class volBrainClient(QtWidgets.QMainWindow):
         
         self.session = session
         self.base_url = base_url
+        
+        self.jobUploadManager = JobUploadManager(base_url, session)
+        self.jobUploadManager.uploaded.connect(self.uploaded)
         
         self.spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         
@@ -64,20 +68,17 @@ class volBrainClient(QtWidgets.QMainWindow):
             QMessageBox.information(self, 'Selecciona un fichero.', "No hay ningún fichero pendiente por subir. Selecciona alguno.", QMessageBox.Ok, QMessageBox.Ok)
 
     def upload(self, files):
-        self.running = True
-        self.thread = threading.Thread(target = self.work, args=(files,))
-        self.thread.start()
-        
-    def work(self, files):
         QMessageBox.information(None, 'Cargando.', "Los archivos han comenzado a cargarse.", QMessageBox.Ok, QMessageBox.Ok)
-        uploaded = volbrain.upload_job(self.base_url, self.session, files)
-        if uploaded == len(files):
+        self.jobUploadManager.addJobs(files)
+        
+    # Este método es ejecutado cuando se termina de subir un paquete de ficheros
+    # en el JobUploadManager.
+    def uploaded(self, uploadedCount, total):
+        if uploadedCount == total:
             QMessageBox.information(None, 'Completado', "Los archivos se han subido correctamente.", QMessageBox.Ok, QMessageBox.Ok)
         else:
-            QMessageBox.warning(None, 'Error', "Ha habido un problema al cargar algún fichero. Quizá hayas superado el límite diario. Subidos " + str(uploaded) + "/" + str(len(files)) + ".", QMessageBox.Ok, QMessageBox.Ok)
-            
-            
-            
+            QMessageBox.warning(None, 'Error', "Ha habido un problema al cargar algún fichero. Quizá hayas superado el límite diario. Subidos " + str(uploadedCount) + "/" + str(total) + ".", QMessageBox.Ok, QMessageBox.Ok)
+        
 
     def chooseFile(self):
         options = QFileDialog.Options()
