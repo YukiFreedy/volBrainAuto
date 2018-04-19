@@ -122,8 +122,6 @@ class LoginDialog(QtWidgets.QDialog):
         self.ui = Ui_Login()
         self.ui.setupUi(self)
         self.ui.loginErrorLabel.setVisible(False)
-        self.ui.email.setText("vicrivaz@inf.upv.es")
-        self.ui.password.setText("09081996")
 
     def getLogin(self):
         return (self.ui.email.text(), self.ui.password.text())
